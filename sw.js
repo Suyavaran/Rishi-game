@@ -1,7 +1,7 @@
 // Rishi's Magic World — Service Worker
 // Caches the entire app for offline use.
 
-const CACHE_NAME = 'rishi-magic-world-v2';
+const CACHE_NAME = 'rishi-magic-world-v3';
 const CORE_ASSETS = ['./'];   // Only the one HTML file needed
 
 // ── Install: cache the app ────────────────────────────────────────────────────

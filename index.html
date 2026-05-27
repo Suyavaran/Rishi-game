@@ -320,6 +320,14 @@ html,body{width:100%;height:100%;overflow:hidden;
 <div class="parent-panel" id="pp">
   <div class="pp-title">Parent Guide</div>
   <div class="pp-body" id="pp-body">Select a game to see tips.</div>
+  <div style="margin-top:10px;border-top:1px solid #eee;padding-top:10px">
+    <label style="font-size:.75rem;font-weight:700;color:#555;display:block;margin-bottom:4px">🔊 Voice</label>
+    <select id="voice-select" style="width:100%;font-size:.78rem;padding:5px 8px;border-radius:8px;border:1.5px solid #ccc;background:#fff"
+      onchange="setVoice(this.value)">
+      <option value="">Loading voices…</option>
+    </select>
+    <button onclick="speak('Hello Rishi! Let us play!')" style="margin-top:6px;width:100%;font-size:.78rem;padding:5px;border-radius:8px;border:none;background:#0D7377;color:#fff;cursor:pointer;font-weight:700">▶ Test voice</button>
+  </div>
 </div>
 
 <!-- ══ HOME ══ -->
@@ -528,6 +536,35 @@ function speak(text,rate=0.82){
   return u;
 }
 function speakTgt(){speak(curTgt,0.75)}
+
+function populateVoiceSelect(){
+  const sel=document.getElementById('voice-select');
+  if(!sel)return;
+  const all=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  if(!all.length)return;
+  sel.innerHTML='';
+  // Sort: enhanced/neural first, then by name
+  all.sort((a,b)=>{
+    const aH=/(enhanced|online|natural)/i.test(a.name)?0:1;
+    const bH=/(enhanced|online|natural)/i.test(b.name)?0:1;
+    return aH-bH||a.name.localeCompare(b.name);
+  });
+  all.forEach(v=>{
+    const opt=document.createElement('option');
+    opt.value=v.name;
+    const tag=/(enhanced|online|natural)/i.test(v.name)?'★ ':'';
+    opt.textContent=tag+v.name+' ('+v.lang+')';
+    if(_bestVoice && v.name===_bestVoice.name) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+function setVoice(name){
+  const v=speechSynthesis.getVoices().find(v=>v.name===name);
+  if(v){ _bestVoice=v; speak('Hello Rishi! Let us play!'); }
+}
+// Populate when voices load
+speechSynthesis.addEventListener('voiceschanged',populateVoiceSelect);
+setTimeout(populateVoiceSelect,600);
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const S={
