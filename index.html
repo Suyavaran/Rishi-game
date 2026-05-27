@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rishi's Magic World</title>
+  <!-- ═══ PWA ═══════════════════════════════════════════════ -->
+  <meta name="theme-color" content="#0D7377">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rishi's World">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Rishi's World">
+  <meta name="msapplication-TileColor" content="#0D7377">
+  <!-- Apple icon generated at runtime by canvas (see bottom of script) -->
+  <link rel="apple-touch-icon" id="pwa-apple-icon" href="">
+  <!-- Manifest injected at runtime -->
+  <link rel="manifest" id="pwa-manifest" href="">
+  <!-- ══════════════════════════════════════════════════════════ -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0D7377;--teal-lt:#D6F0F0;
+  --orange:#E87722;--orange-lt:#FFF0E0;
+  --purple:#5B4FCF;--purple-lt:#EEECFB;
+  --green:#1A7A4A;--green-lt:#E2F5EB;
+  --blue:#1565C0;--blue-lt:#E3F0FB;
+  --pink:#C2185B;--pink-lt:#FCE4EC;
+  --yellow:#F5A623;--yellow-lt:#FFFAE0;
+  --red:#C62828;
+  --shadow:0 8px 32px rgba(0,0,0,.18);
+  --r:22px;
+}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 55%,#0f3460 100%)}
+
+/* ── Stars ── */
+#stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:rgba(255,255,255,.7);
+  animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+/* ── Screens ── */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:14px;
+  opacity:0;pointer-events:none;transition:opacity .35s;overflow-y:auto}
+.screen.active{opacity:1;pointer-events:all}
+
+/* ── HOME ── */
+.home-title{text-align:center;font-size:clamp(1.8rem,7vw,3rem);font-weight:900;line-height:1.1;
+  background:linear-gradient(135deg,#FFD700,#FF6B6B,#A29BFE,#74B9FF);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.home-sub{color:rgba(255,255,255,.8);font-size:clamp(.85rem,3vw,1.1rem);font-weight:700;text-align:center}
+.stars-bar{display:flex;align-items:center;gap:8px;background:rgba(255,215,0,.2);
+  border:2px solid rgba(255,215,0,.5);border-radius:50px;padding:7px 18px;
+  color:#FFD700;font-size:1.1rem;font-weight:800}
+.games-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;width:100%;max-width:600px}
+.game-card{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);
+  border:3px solid rgba(255,255,255,.2);border-radius:var(--r);padding:16px 10px;
+  text-align:center;cursor:pointer;transition:transform .2s,background .2s,box-shadow .2s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none}
+.game-card:active,.game-card:hover{transform:scale(1.07);background:rgba(255,255,255,.22);box-shadow:var(--shadow)}
+.gc-emoji{font-size:clamp(2rem,7vw,3rem)}
+.gc-title{color:#fff;font-weight:800;font-size:clamp(.75rem,2.5vw,.95rem)}
+.gc-sub{color:rgba(255,255,255,.6);font-size:clamp(.65rem,2vw,.78rem)}
+.gc-stars{color:#FFD700;font-size:.8rem}
+
+/* ── TOPBAR ── */
+.topbar{width:100%;max-width:640px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.btn-back{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:50px;padding:7px 16px;
+  font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-back:hover{background:rgba(255,255,255,.28)}
+.round-dots{display:flex;gap:7px}
+.dot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .3s,transform .3s}
+.dot.done{background:#FFD700;transform:scale(1.2)}
+.score-badge{background:rgba(255,215,0,.2);border:2px solid rgba(255,215,0,.5);
+  border-radius:50px;padding:5px 14px;color:#FFD700;font-size:.95rem;font-weight:800}
+
+/* ── SPEECH BOX ── */
+.speech-box{background:rgba(255,255,255,.97);border-radius:18px;padding:11px 16px;
+  width:100%;max-width:640px;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow);flex-shrink:0}
+.speech-icon{font-size:1.7rem}
+.speech-content{flex:1;min-width:0}
+.speech-label{font-size:.72rem;color:var(--purple);font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.speech-target{font-size:clamp(1rem,3.5vw,1.4rem);font-weight:900;color:var(--teal);line-height:1.2}
+.speech-parent{font-size:.72rem;color:#888;font-weight:700;margin-top:2px}
+.btn-speak{background:var(--teal);color:#fff;border:none;border-radius:50%;
+  width:40px;height:40px;font-size:1.2rem;cursor:pointer;
+  transition:transform .15s,background .15s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-speak:hover{transform:scale(1.1);background:var(--purple)}
+
+/* ── GAME AREA ── */
+#game-area{width:100%;max-width:640px;flex:1;display:flex;align-items:center;
+  justify-content:center;min-height:220px;overflow:visible}
+#screen-game{gap:10px;justify-content:flex-start;padding-top:10px}
+.game-name{color:#fff;font-weight:900;font-size:clamp(1.1rem,4vw,1.6rem)}
+.game-instr{color:rgba(255,255,255,.75);font-weight:700;font-size:clamp(.8rem,2.5vw,1rem)}
+
+/* ── COLOUR CATCH ── */
+.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.color-btn{aspect-ratio:1;border-radius:50%;border:5px solid rgba(255,255,255,.4);
+  cursor:pointer;transition:transform .15s,border-color .15s;
+  display:flex;align-items:center;justify-content:center;font-size:clamp(1.8rem,6vw,2.6rem);
+  box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.color-btn:hover,.color-btn:active{transform:scale(1.12);border-color:#fff}
+.color-btn.correct{border-color:#FFD700;animation:cpulse .4s ease}
+.color-btn.wrong{animation:shake .4s ease}
+@keyframes cpulse{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1.12)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+
+/* ── NUMBER TRAIN ── */
+.animal-grid{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.animal-btn{width:clamp(65px,16vw,85px);height:clamp(65px,16vw,85px);
+  background:rgba(255,255,255,.15);border:4px solid rgba(255,255,255,.3);
+  border-radius:18px;font-size:clamp(1.9rem,6vw,2.7rem);
+  cursor:pointer;transition:transform .2s,background .2s;
+  display:flex;align-items:center;justify-content:center}
+.animal-btn.tapped{background:rgba(255,215,0,.4);border-color:#FFD700;transform:scale(1.15)}
+.count-num{font-size:clamp(2.5rem,9vw,4rem);font-weight:900;color:#FFD700;text-shadow:0 4px 16px rgba(0,0,0,.4)}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;
+  border:none;border-radius:50px;padding:13px 28px;font-size:1.1rem;font-weight:800;
+  font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s}
+.btn-primary:hover{transform:scale(1.05)}
+
+/* ── LETTER SAFARI ── */
+.letter-big{font-size:clamp(5rem,18vw,8rem);font-weight:900;color:#FFD700;
+  text-shadow:0 8px 32px rgba(0,0,0,.4);line-height:1}
+.letter-choices{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;width:100%}
+.letter-btn{background:rgba(255,255,255,.12);border:4px solid rgba(255,255,255,.3);
+  border-radius:22px;padding:14px 16px;cursor:pointer;
+  transition:transform .15s,background .2s,border-color .2s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;min-width:90px}
+.letter-btn:hover{transform:scale(1.08);background:rgba(255,255,255,.22)}
+.letter-btn.correct{border-color:#FFD700;background:rgba(255,215,0,.25)}
+.letter-btn.wrong{border-color:#E53935;background:rgba(229,57,53,.2)}
+.lc-em{font-size:clamp(2.3rem,7vw,3.2rem)}
+.lc-wd{color:#fff;font-size:.95rem;font-weight:800}
+
+/* ── ACTION HERO ── */
+.action-big{font-size:clamp(5rem,17vw,9rem);animation:apulse 1.5s ease-in-out infinite}
+@keyframes apulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08) rotate(4deg)}}
+.action-word{font-size:clamp(2rem,7vw,3.2rem);font-weight:900;color:#fff;
+  text-shadow:0 4px 16px rgba(0,0,0,.4)}
+.action-instr{background:rgba(255,255,255,.15);border-radius:14px;padding:10px 20px;
+  color:rgba(255,255,255,.9);font-size:clamp(.85rem,2.5vw,1rem);font-weight:700}
+.action-choices{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%}
+.action-btn{background:rgba(255,255,255,.12);border:4px solid rgba(255,255,255,.3);
+  border-radius:18px;padding:12px 16px;cursor:pointer;
+  transition:transform .15s,background .2s;
+  display:flex;flex-direction:column;align-items:center;gap:5px;min-width:85px}
+.action-btn:hover{transform:scale(1.08);background:rgba(255,255,255,.22)}
+.ac-em{font-size:2.3rem}.ac-wd{color:#fff;font-size:.9rem;font-weight:800}
+
+/* ── ECHO & GROW ── */
+#screen-echo{gap:14px;justify-content:flex-start;padding-top:12px}
+.echo-context{text-align:center;width:100%;max-width:640px;flex-shrink:0}
+.echo-scene{font-size:clamp(3rem,10vw,5rem);line-height:1;margin-bottom:4px}
+.echo-scene-label{color:rgba(255,255,255,.7);font-size:.95rem;font-weight:700}
+.phrase-stage{width:100%;max-width:640px;flex-shrink:0}
+.phrase-label{color:rgba(255,255,255,.65);font-size:.8rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;text-align:center}
+.phrase-words{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:12px}
+.phrase-word{padding:10px 18px;border-radius:50px;font-size:clamp(1.1rem,4vw,1.5rem);
+  font-weight:900;border:3px solid;
+  animation:wordPop .4s ease var(--delay,.0s) both}
+@keyframes wordPop{from{transform:scale(0) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.phrase-word.w0{background:#FFD700;border-color:#F5A623;color:#1a1a2e}
+.phrase-word.w1{background:var(--teal-lt);border-color:var(--teal);color:var(--teal)}
+.phrase-word.w2{background:var(--purple-lt);border-color:var(--purple);color:var(--purple)}
+.phrase-word.w3{background:var(--green-lt);border-color:var(--green);color:var(--green)}
+.phrase-word.w4{background:var(--orange-lt);border-color:var(--orange);color:var(--orange)}
+.echo-controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;width:100%;max-width:640px;flex-shrink:0}
+.btn-hear{background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.4);
+  color:#fff;border-radius:50px;padding:11px 22px;font-family:'Nunito',sans-serif;
+  font-size:1rem;font-weight:800;cursor:pointer;transition:background .2s;display:flex;align-items:center;gap:8px}
+.btn-hear:hover{background:rgba(255,255,255,.28)}
+.btn-confirm{background:linear-gradient(135deg,var(--green),var(--teal));color:#fff;
+  border:none;border-radius:50px;padding:14px 28px;
+  font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:900;
+  cursor:pointer;box-shadow:var(--shadow);transition:transform .2s;display:flex;align-items:center;gap:8px}
+.btn-confirm:hover{transform:scale(1.05)}
+.echo-progress{width:100%;max-width:640px;flex-shrink:0}
+.echo-prog-bar{height:10px;background:rgba(255,255,255,.15);border-radius:50px;overflow:hidden}
+.echo-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),#FFD700);
+  border-radius:50px;transition:width .5s ease}
+.echo-stage-label{color:rgba(255,255,255,.6);font-size:.8rem;font-weight:700;text-align:center;margin-top:6px}
+.echo-tip{background:rgba(255,255,255,.1);border-radius:14px;padding:10px 16px;
+  width:100%;max-width:640px;flex-shrink:0;text-align:center}
+.echo-tip-text{color:rgba(255,255,255,.75);font-size:.85rem;font-weight:700}
+.echo-tip-parent{color:rgba(255,215,0,.9);font-size:.8rem;font-weight:800;margin-top:4px}
+
+/* ── STORY WORLD ── */
+#screen-story-select{gap:16px}
+.story-title-main{color:#fff;font-weight:900;font-size:clamp(1.4rem,5vw,2rem);text-align:center}
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:560px}
+.story-card{background:rgba(255,255,255,.1);border:3px solid rgba(255,255,255,.2);
+  border-radius:var(--r);padding:18px 14px;text-align:center;cursor:pointer;
+  transition:transform .2s,background .2s;display:flex;flex-direction:column;gap:8px;align-items:center}
+.story-card:hover,.story-card:active{transform:scale(1.06);background:rgba(255,255,255,.2)}
+.story-card-emoji{font-size:clamp(2.2rem,7vw,3rem)}
+.story-card-title{color:#fff;font-weight:800;font-size:clamp(.8rem,2.5vw,1rem)}
+.story-card-sub{color:rgba(255,255,255,.6);font-size:clamp(.68rem,2vw,.82rem)}
+
+#screen-story-read{gap:0;justify-content:flex-start;padding:10px}
+.story-topbar{width:100%;max-width:680px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 4px;margin-bottom:10px;flex-shrink:0}
+.story-progress{display:flex;gap:8px}
+.story-dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .3s}
+.story-dot.active{background:#FFD700}
+.story-dot.done{background:rgba(255,215,0,.5)}
+
+.story-frame{width:100%;max-width:680px;flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.scene-box{border-radius:24px;overflow:hidden;position:relative;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:clamp(160px,35vh,260px);padding:16px}
+.scene-sky{font-size:clamp(2rem,6vw,3.2rem);position:absolute;top:10px;left:0;right:0;
+  text-align:center;opacity:.9}
+.scene-ground{font-size:clamp(2rem,6vw,3rem);position:absolute;bottom:8px;left:0;right:0;
+  text-align:center;opacity:.9}
+.scene-main{font-size:clamp(4rem,13vw,7rem);position:relative;z-index:2;
+  animation:sceneFloat 3s ease-in-out infinite alternate;text-shadow:0 8px 24px rgba(0,0,0,.3)}
+@keyframes sceneFloat{from{transform:translateY(0)}to{transform:translateY(-12px)}}
+.scene-caption{color:#fff;font-size:clamp(1rem,3.5vw,1.3rem);font-weight:800;
+  text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.scene-speech{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);
+  border-radius:16px;padding:10px 16px;width:100%;max-width:680px;flex-shrink:0}
+.speech-bubble-text{flex:1;font-size:clamp(.95rem,3vw,1.2rem);font-weight:900;color:var(--teal)}
+.scene-say{font-size:.75rem;color:var(--purple);font-weight:800;text-transform:uppercase;letter-spacing:1px}
+.story-nav{display:flex;gap:12px;justify-content:center;width:100%;max-width:680px;flex-shrink:0;margin-top:8px}
+.btn-story-nav{border-radius:50px;padding:12px 28px;font-family:'Nunito',sans-serif;
+  font-size:1rem;font-weight:800;cursor:pointer;border:none;transition:transform .2s,opacity .2s}
+.btn-story-nav:hover{transform:scale(1.05)}
+.btn-next-frame{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;box-shadow:var(--shadow)}
+.btn-replay{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3) !important;
+  border-style:solid;color:#fff}
+
+/* ── STORY QUESTIONS ── */
+#screen-story-q{gap:14px;justify-content:flex-start;padding-top:12px}
+.sq-header{color:#fff;font-weight:900;font-size:clamp(1.1rem,4vw,1.5rem);text-align:center}
+.sq-question{background:rgba(255,255,255,.12);border-radius:18px;padding:14px 20px;
+  color:#fff;font-size:clamp(1rem,3.5vw,1.3rem);font-weight:800;text-align:center;
+  width:100%;max-width:640px}
+.sq-choices{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;width:100%;max-width:640px}
+.sq-btn{background:rgba(255,255,255,.12);border:4px solid rgba(255,255,255,.3);
+  border-radius:22px;padding:16px 14px;cursor:pointer;
+  transition:transform .15s,background .2s,border-color .2s;
+  display:flex;flex-direction:column;align-items:center;gap:7px;min-width:110px;max-width:160px}
+.sq-btn:hover{transform:scale(1.08);background:rgba(255,255,255,.22)}
+.sq-btn.correct{border-color:#FFD700;background:rgba(255,215,0,.25)}
+.sq-btn.wrong{border-color:#E53935;background:rgba(229,57,53,.2)}
+.sq-em{font-size:clamp(2.3rem,7vw,3.2rem)}
+.sq-wd{color:#fff;font-size:.95rem;font-weight:800;text-align:center}
+.sq-say{background:rgba(255,215,0,.15);border:2px solid rgba(255,215,0,.4);
+  border-radius:14px;padding:10px 16px;color:#FFD700;font-size:.9rem;font-weight:800;
+  text-align:center;width:100%;max-width:640px}
+
+/* ── CELEBRATE ── */
+#screen-celebrate{gap:18px;text-align:center}
+.cel-em{font-size:5rem;animation:bounce 1s ease-in-out infinite alternate}
+@keyframes bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-18px) scale(1.1)}}
+.cel-title{font-size:clamp(1.8rem,7vw,2.8rem);font-weight:900;color:#FFD700;
+  text-shadow:0 4px 16px rgba(0,0,0,.4)}
+.cel-sub{color:rgba(255,255,255,.85);font-size:1.1rem;font-weight:700}
+.cel-stars{font-size:2.8rem;letter-spacing:8px}
+.btn-home{background:linear-gradient(135deg,var(--teal),var(--purple));color:#fff;
+  border:none;border-radius:50px;padding:15px 38px;font-size:1.2rem;font-weight:800;
+  font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:var(--shadow);transition:transform .2s}
+.btn-home:hover{transform:scale(1.05)}
+
+/* ── FEEDBACK ── */
+.feedback-overlay{position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s}
+.feedback-overlay.show{opacity:1;pointer-events:all}
+.fb-em{font-size:5.5rem;animation:popIn .4s ease}
+.fb-tx{color:#fff;font-size:2.3rem;font-weight:900;text-shadow:0 4px 16px rgba(0,0,0,.5);
+  animation:popIn .4s .1s ease both}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── CONFETTI ── */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:300}
+.cp{position:absolute;top:-20px;animation:cfall var(--d,3s) ease-in var(--dl,0s) forwards}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* ── PARENT PANEL ── */
+#parent-btn{position:fixed;bottom:12px;right:12px;z-index:400;
+  background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35);
+  color:#fff;border-radius:50%;width:44px;height:44px;font-size:1.2rem;
+  cursor:pointer;backdrop-filter:blur(8px)}
+.parent-panel{position:fixed;bottom:66px;right:12px;background:rgba(255,255,255,.97);
+  border-radius:18px;padding:14px 18px;max-width:290px;box-shadow:var(--shadow);z-index:400;display:none}
+.parent-panel.open{display:block}
+.pp-title{font-size:.8rem;font-weight:900;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.pp-body{font-size:.85rem;color:#333;font-weight:600;line-height:1.5;white-space:pre-line}
+
+@media(max-height:580px){
+  .scene-box{min-height:120px}
+  .gc-emoji{font-size:1.8rem!important}
+}
+</style>
+</head>
+<body>
+<div id="stars-bg"></div>
+<div id="confetti"></div>
+
+<!-- Feedback -->
+<div class="feedback-overlay" id="fb">
+  <div class="fb-em" id="fb-em"></div>
+  <div class="fb-tx" id="fb-tx"></div>
+</div>
+
+<!-- Parent button -->
+<button id="parent-btn" onclick="togglePP()">👨‍👩‍👦</button>
+<div class="parent-panel" id="pp">
+  <div class="pp-title">Parent Guide</div>
+  <div class="pp-body" id="pp-body">Select a game to see tips.</div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="screen-home" class="screen active">
+  <div class="home-title">🌟 Rishi's<br>Magic World</div>
+  <div class="home-sub">Tap a game to start!</div>
+  <div class="stars-bar">⭐ <span id="total-stars">0</span> Stars</div>
+  <div class="games-grid">
+    <div class="game-card" onclick="startGame('color')">
+      <div class="gc-emoji">🎨</div>
+      <div class="gc-title">Rainbow Catch</div>
+      <div class="gc-sub">Find the colour!</div>
+      <div class="gc-stars" id="gs-color">☆☆☆☆☆</div>
+    </div>
+    <div class="game-card" onclick="startGame('count')">
+      <div class="gc-emoji">🚂</div>
+      <div class="gc-title">Number Train</div>
+      <div class="gc-sub">Count them all!</div>
+      <div class="gc-stars" id="gs-count">☆☆☆☆☆</div>
+    </div>
+    <div class="game-card" onclick="startGame('letter')">
+      <div class="gc-emoji">🔤</div>
+      <div class="gc-title">Letter Safari</div>
+      <div class="gc-sub">Match the letter!</div>
+      <div class="gc-stars" id="gs-letter">☆☆☆☆☆</div>
+    </div>
+    <div class="game-card" onclick="startGame('action')">
+      <div class="gc-emoji">🦸</div>
+      <div class="gc-title">Action Hero</div>
+      <div class="gc-sub">Move and say it!</div>
+      <div class="gc-stars" id="gs-action">☆☆☆☆☆</div>
+    </div>
+    <div class="game-card" onclick="startEcho()" style="border-color:rgba(255,215,0,.4)">
+      <div class="gc-emoji">🗣️</div>
+      <div class="gc-title">Echo & Grow</div>
+      <div class="gc-sub">Grow your words!</div>
+      <div class="gc-stars" id="gs-echo">☆☆☆☆☆</div>
+    </div>
+    <div class="game-card" onclick="startStorySelect()" style="border-color:rgba(162,155,254,.4)">
+      <div class="gc-emoji">📖</div>
+      <div class="gc-title">Story World</div>
+      <div class="gc-sub">Picture stories!</div>
+      <div class="gc-stars" id="gs-story">☆☆☆☆☆</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME SCREEN (colour/count/letter/action) ══ -->
+<div id="screen-game" class="screen">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">← Home</button>
+    <div class="round-dots" id="round-dots"></div>
+    <div class="score-badge">⭐ <span id="sess-score">0</span></div>
+  </div>
+  <div style="text-align:center;flex-shrink:0">
+    <div class="game-name" id="gname"></div>
+    <div class="game-instr" id="ginstr"></div>
+  </div>
+  <div class="speech-box">
+    <div class="speech-icon">🗣️</div>
+    <div class="speech-content">
+      <div class="speech-label">Say it!</div>
+      <div class="speech-target" id="stgt">—</div>
+      <div class="speech-parent" id="sparent"></div>
+    </div>
+    <button class="btn-speak" onclick="speakTgt()">🔊</button>
+  </div>
+  <div id="game-area"></div>
+</div>
+
+<!-- ══ ECHO & GROW ══ -->
+<div id="screen-echo" class="screen">
+  <div class="topbar">
+    <button class="btn-back" onclick="goHome()">← Home</button>
+    <div class="score-badge">⭐ <span id="echo-score">0</span></div>
+  </div>
+  <div style="text-align:center;flex-shrink:0">
+    <div class="game-name" style="color:#FFD700">🗣️ Echo &amp; Grow</div>
+    <div class="game-instr">Listen → Echo → Watch your phrase grow!</div>
+  </div>
+  <div class="echo-context">
+    <div class="echo-scene" id="echo-scene">💧</div>
+    <div class="echo-scene-label" id="echo-scene-label">At drink time</div>
+  </div>
+  <div class="phrase-stage">
+    <div class="phrase-label">Say this phrase:</div>
+    <div class="phrase-words" id="phrase-words"></div>
+  </div>
+  <div class="echo-controls">
+    <button class="btn-hear" onclick="speakEchoPhrase()">🔊 Hear it again</button>
+    <button class="btn-confirm" id="btn-confirm" onclick="confirmEcho()">
+      ✅ Rishi said it!
+    </button>
+  </div>
+  <div class="echo-progress">
+    <div class="echo-prog-bar"><div class="echo-prog-fill" id="echo-fill" style="width:0%"></div></div>
+    <div class="echo-stage-label" id="echo-stage-label">Stage 1 of 5</div>
+  </div>
+  <div class="echo-tip">
+    <div class="echo-tip-text" id="echo-tip-text">Play the phrase, then wait for Rishi to echo it.</div>
+    <div class="echo-tip-parent" id="echo-tip-parent">👨‍👩‍👦 Parent: model the phrase slowly if needed</div>
+  </div>
+</div>
+
+<!-- ══ STORY SELECT ══ -->
+<div id="screen-story-select" class="screen">
+  <div class="topbar" style="max-width:560px">
+    <button class="btn-back" onclick="goHome()">← Home</button>
+    <div class="score-badge">📖 Story World</div>
+  </div>
+  <div class="story-title-main">Choose a story!</div>
+  <div class="story-grid" id="story-grid"></div>
+</div>
+
+<!-- ══ STORY READ ══ -->
+<div id="screen-story-read" class="screen">
+  <div class="story-topbar">
+    <button class="btn-back" onclick="showScreen('screen-story-select')">← Stories</button>
+    <div class="story-progress" id="story-prog"></div>
+    <div class="score-badge" id="story-title-badge">Story</div>
+  </div>
+  <div class="story-frame" id="story-frame"></div>
+  <div class="story-nav">
+    <button class="btn-story-nav btn-replay" onclick="replayFrame()">🔊 Hear again</button>
+    <button class="btn-story-nav btn-next-frame" id="btn-next-frame" onclick="nextFrame()">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══ STORY QUESTIONS ══ -->
+<div id="screen-story-q" class="screen">
+  <div class="topbar" style="max-width:640px">
+    <button class="btn-back" onclick="goHome()">← Home</button>
+    <div class="score-badge">⭐ <span id="sq-score">0</span></div>
+  </div>
+  <div class="sq-header" id="sq-header">What did you see?</div>
+  <div class="sq-question" id="sq-q"></div>
+  <div class="sq-choices" id="sq-choices"></div>
+  <div class="sq-say" id="sq-say"></div>
+</div>
+
+<!-- ══ CELEBRATE ══ -->
+<div id="screen-celebrate" class="screen">
+  <div class="cel-em">🏆</div>
+  <div class="cel-title" id="cel-title">Amazing!</div>
+  <div class="cel-sub" id="cel-sub">You did it, Rishi!</div>
+  <div class="cel-stars" id="cel-stars">⭐⭐⭐</div>
+  <button class="btn-home" onclick="goHome()">🏠 Play Again!</button>
+</div>
+
+<script>
+// ── Stars bg ──────────────────────────────────────────────────────────────────
+(()=>{const c=document.getElementById('stars-bg');for(let i=0;i<55;i++){const s=document.createElement('div');const sz=Math.random()*4+2;s.className='star';s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;--dl:${Math.random()*4}s`;c.appendChild(s)}})();
+
+// ── Speech ────────────────────────────────────────────────────────────────────
+let curTgt='';
+function speak(text,rate=.8){if(!text)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=rate;u.pitch=1.12;u.volume=1;const vs=speechSynthesis.getVoices();const v=vs.find(v=>v.name.includes('Samantha')||v.name.includes('Karen')||v.name.includes('Google UK English Female'));if(v)u.voice=v;speechSynthesis.speak(u);return u}
+function speakTgt(){speak(curTgt,.72)}
+window.addEventListener('load',()=>speechSynthesis.getVoices());
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const S={
+  game:null,round:0,maxRounds:5,score:0,
+  totalStars:0,
+  gameStars:{color:0,count:0,letter:0,action:0,echo:0,story:0},
+  locked:false,tapped:new Set(),
+  echoProgram:null,echoStage:0,echoScore:0,
+  story:null,frameIdx:0,qIdx:0,qScore:0,
+};
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+const COLORS=[
+  {n:'Red',hex:'#E53935',em:'🔴',say:'Red!',expand:'I see RED!'},
+  {n:'Blue',hex:'#1E88E5',em:'🔵',say:'Blue!',expand:'I see BLUE!'},
+  {n:'Green',hex:'#43A047',em:'🟢',say:'Green!',expand:'I see GREEN!'},
+  {n:'Yellow',hex:'#FDD835',em:'🟡',say:'Yellow!',expand:'I see YELLOW!'},
+  {n:'Orange',hex:'#FB8C00',em:'🟠',say:'Orange!',expand:'I see ORANGE!'},
+  {n:'Purple',hex:'#9C27B0',em:'🟣',say:'Purple!',expand:'I see PURPLE!'},
+  {n:'Pink',hex:'#E91E63',em:'🩷',say:'Pink!',expand:'I see PINK!'},
+  {n:'Brown',hex:'#795548',em:'🟤',say:'Brown!',expand:'I see BROWN!'},
+];
+const ANIMALS=['🐶','🐱','🐸','🦁','🐘','🐧','🦊','🐻','🦄','🐼'];
+const LETTERS=[
+  {l:'A',ok:{em:'🍎',w:'Apple'},no:[{em:'🚌',w:'Bus'},{em:'🌙',w:'Moon'}]},
+  {l:'B',ok:{em:'🎈',w:'Balloon'},no:[{em:'🌸',w:'Flower'},{em:'🍕',w:'Pizza'}]},
+  {l:'C',ok:{em:'🐱',w:'Cat'},no:[{em:'🚂',w:'Train'},{em:'🍉',w:'Watermelon'}]},
+  {l:'D',ok:{em:'🐶',w:'Dog'},no:[{em:'🌈',w:'Rainbow'},{em:'🎸',w:'Guitar'}]},
+  {l:'F',ok:{em:'🐸',w:'Frog'},no:[{em:'🎂',w:'Cake'},{em:'🚗',w:'Car'}]},
+  {l:'H',ok:{em:'🏠',w:'House'},no:[{em:'🐸',w:'Frog'},{em:'🍎',w:'Apple'}]},
+  {l:'R',ok:{em:'🌈',w:'Rainbow'},no:[{em:'🐘',w:'Elephant'},{em:'🎈',w:'Balloon'}]},
+  {l:'S',ok:{em:'⭐',w:'Star'},no:[{em:'🍇',w:'Grapes'},{em:'🐶',w:'Dog'}]},
+  {l:'M',ok:{em:'🌙',w:'Moon'},no:[{em:'🐱',w:'Cat'},{em:'🎈',w:'Balloon'}]},
+  {l:'T',ok:{em:'🌮',w:'Taco'},no:[{em:'🏠',w:'House'},{em:'🌸',w:'Flower'}]},
+];
+const ACTIONS=[
+  {w:'JUMP',em:'🦘',instr:'Jump up and down! Say: "I am JUMPING!"',say:'Jump! I am jumping!'},
+  {w:'CLAP',em:'👏',instr:'Clap your hands! Say: "I am CLAPPING!"',say:'Clap! I am clapping!'},
+  {w:'SPIN',em:'🌀',instr:'Spin around! Say: "I am SPINNING!"',say:'Spin! I am spinning!'},
+  {w:'WAVE',em:'👋',instr:'Wave hello! Say: "I am WAVING!"',say:'Wave! I am waving!'},
+  {w:'STOMP',em:'🦶',instr:'Stomp your feet! Say: "I am STOMPING!"',say:'Stomp! I am stomping!'},
+  {w:'DANCE',em:'💃',instr:'Dance around! Say: "I am DANCING!"',say:'Dance! I am dancing!'},
+  {w:'RUN',em:'🏃',instr:'Run in place! Say: "I am RUNNING!"',say:'Run! I am running!'},
+];
+const APOOL=[{w:'JUMP',em:'🦘'},{w:'CLAP',em:'👏'},{w:'SPIN',em:'🌀'},{w:'WAVE',em:'👋'},{w:'STOMP',em:'🦶'},{w:'DANCE',em:'💃'},{w:'RUN',em:'🏃'}];
+
+// ── Echo Programs ─────────────────────────────────────────────────────────────
+const ECHO_PROGRAMS=[
+  {
+    scene:'💧🥤',label:'At drink time',
+    stages:[
+      {words:['Water'],tip:'Hold up a cup. Rishi sees it and says the word.',parent:'Wait after showing the cup — give him 5 seconds'},
+      {words:['Want','water'],tip:'He said "water"! Now show him "want water".',parent:'Model it slowly: "Want... water"'},
+      {words:['I','want','water'],tip:'Growing! Now 3 words — "I want water".',parent:'Hold out the cup and model: "I... want... water"'},
+      {words:['I','want','water','please'],tip:'Adding "please" — so polite!',parent:'Pause after "water" — wait for "please"'},
+      {words:['Can','I','have','water','please?'],tip:'A full sentence! This is amazing!',parent:'Celebrate HUGE if he attempts any part of this!'},
+    ]
+  },
+  {
+    scene:'🍎🍪',label:'Snack time',
+    stages:[
+      {words:['More'],tip:'Give a small bite, then wait.',parent:'Hold the snack up — look expectant'},
+      {words:['More','please'],tip:'"More please" — adding a polite word!',parent:'Model: "More... please" with a gentle pause'},
+      {words:['I','want','more'],tip:'Three words! "I want more".',parent:'Hold back the snack — wait for the phrase'},
+      {words:['I','want','more','snack'],tip:'Adding the snack name!',parent:'Point to the snack as he says it'},
+      {words:['Can','I','have','more','please?'],tip:'Full polite request — incredible!',parent:'This is the Mand goal! Celebrate every attempt!'},
+    ]
+  },
+  {
+    scene:'🤚🆘',label:'When you need help',
+    stages:[
+      {words:['Help'],tip:'Rishi tries to open something. Wait for "help".',parent:'Look expectant — don\'t rush to help yet'},
+      {words:['Help','me'],tip:'"Help me" — two powerful words!',parent:'Model: "Help... me" with a pause'},
+      {words:['Need','help'],tip:'"Need help" — expressing a need!',parent:'Create a task he can\'t do alone'},
+      {words:['I','need','help'],tip:'Three words! So clear!',parent:'Model once then wait — don\'t repeat'},
+      {words:['Help','me','please'],tip:'Polite request for help!',parent:'Reinforce immediately every time he uses this!'},
+    ]
+  },
+  {
+    scene:'🌳🏃',label:'Going outside',
+    stages:[
+      {words:['Go'],tip:'He sees shoes or the door — wait for "go".',parent:'Stand at the door. Look expectant.'},
+      {words:['Go','outside'],tip:'"Go outside" — expanding!',parent:'Point to outside while you model'},
+      {words:['Let\'s','go'],tip:'"Let\'s go" — a social phrase!',parent:'Model with excitement: "Let\'s... go!"'},
+      {words:['Let\'s','go','outside'],tip:'Three words — he\'s going outside!',parent:'Use this every single time you head out'},
+      {words:['I','want','to','go','outside'],tip:'A full sentence! This is a huge milestone!',parent:'Celebrate wildly if he gets any 3 words of this!'},
+    ]
+  },
+  {
+    scene:'💤😴',label:'At bedtime',
+    stages:[
+      {words:['Sleep'],tip:'Dim the lights — wait for "sleep".',parent:'Yawn dramatically. Point to bed.'},
+      {words:['I','tired'],tip:'"I tired" — matching his current phrase!',parent:'Mirror Rishi\'s actual phrase back to him'},
+      {words:['I\'m','sleepy'],tip:'"I\'m sleepy" — feeling word!',parent:'Rub your eyes — model the phrase'},
+      {words:['Goodnight','Mama'],tip:'A loving social phrase!',parent:'Say "goodnight" first — wait for response'},
+      {words:['I\'m','tired','goodnight'],tip:'Three words at bedtime!',parent:'Make this a nightly ritual — same phrase every night!'},
+    ]
+  },
+];
+
+// ── Stories ───────────────────────────────────────────────────────────────────
+const STORIES=[
+  {
+    title:"Rishi's Morning",em:'🌅',sub:'Wake up, eat, brush, go!',
+    frames:[
+      {sky:'☀️🌤️',main:'😴🛏️',ground:'🌸🌿🌺',bg:'linear-gradient(180deg,#FFF9C4,#FFF3E0)',
+       caption:"Good morning! Rishi wakes up.",
+       narrate:"Good morning! Rishi wakes up. It is a bright sunny day!",
+       say:"Good morning!",sayLabel:"Rishi says:"},
+      {sky:'🥛🍓',main:'🥣😋',ground:'🪑🌿',bg:'linear-gradient(180deg,#F8BBD9,#FCE4EC)',
+       caption:"Rishi is hungry. He wants breakfast!",
+       narrate:"Rishi is hungry! He says: I want food! Yummy breakfast time!",
+       say:"I am hungry!",sayLabel:"Say:"},
+      {sky:'🫧✨',main:'🦷🪥',ground:'🛁💦',bg:'linear-gradient(180deg,#BBDEFB,#E3F2FD)',
+       caption:"Brush brush brush! Rishi brushes his teeth.",
+       narrate:"Time to brush! Brush brush brush! One, two, three, clean teeth!",
+       say:"Brush teeth!",sayLabel:"Say:"},
+      {sky:'☀️🌈',main:'👟🚪',ground:'🌳🌺',bg:'linear-gradient(180deg,#C8E6C9,#E8F5E9)',
+       caption:"Shoes on! Let's go outside!",
+       narrate:"Shoes on! Ready! Let's go outside! Yay!",
+       say:"Let's go!",sayLabel:"Say:"},
+    ],
+    questions:[
+      {q:"What did Rishi eat?",choices:[{em:'🥣',w:'Breakfast',ok:true},{em:'🍕',w:'Pizza',ok:false},{em:'🎂',w:'Cake',ok:false}],say:"I ate breakfast!"},
+      {q:"What did Rishi brush?",choices:[{em:'🦷',w:'Teeth',ok:true},{em:'💈',w:'Hair',ok:false},{em:'🐕',w:'Dog',ok:false}],say:"Brush teeth!"},
+      {q:"Where did Rishi go?",choices:[{em:'🌳',w:'Outside',ok:true},{em:'🛒',w:'Shop',ok:false},{em:'🏊',w:'Pool',ok:false}],say:"Let's go outside!"},
+    ]
+  },
+  {
+    title:"Bluey is Hungry!",em:'🐕',sub:'Bluey wants a snack',
+    frames:[
+      {sky:'🌤️⛅',main:'🐕🎮',ground:'🌿🪴🌸',bg:'linear-gradient(180deg,#E1F5FE,#B3E5FC)',
+       caption:"Bluey is playing! Zoom zoom!",
+       narrate:"Bluey is playing! She is running and jumping! So much fun!",
+       say:"I am playing!",sayLabel:"Say:"},
+      {sky:'💭🍎',main:'🐕😟',ground:'🌿🌺',bg:'linear-gradient(180deg,#FFF9C4,#FFFDE7)',
+       caption:"Oh no! Bluey is hungry!",
+       narrate:"Oh no! Bluey's tummy is rumbling. She is very hungry!",
+       say:"I am hungry!",sayLabel:"Bluey says:"},
+      {sky:'🏠☀️',main:'🐕🗣️',ground:'🌿🪑',bg:'linear-gradient(180deg,#F8BBD9,#FCE4EC)',
+       caption:"Bluey asks Mum: Can I have a snack?",
+       narrate:"Bluey says: Mum! Can I have a snack please? Mum says: Yes Bluey!",
+       say:"Can I have a snack please?",sayLabel:"Bluey says:"},
+      {sky:'🍪✨',main:'🐕😄',ground:'🌿🪑',bg:'linear-gradient(180deg,#C8E6C9,#DCEDC8)',
+       caption:"Yummy! Bluey is happy now!",
+       narrate:"Yummy yummy! Bluey eats her snack. She is so happy now!",
+       say:"Yummy! Thank you!",sayLabel:"Bluey says:"},
+    ],
+    questions:[
+      {q:"What was Bluey doing first?",choices:[{em:'🎮',w:'Playing',ok:true},{em:'😴',w:'Sleeping',ok:false},{em:'🛁',w:'Bathing',ok:false}],say:"Bluey was playing!"},
+      {q:"What does Bluey want?",choices:[{em:'🍪',w:'A snack',ok:true},{em:'🎈',w:'A balloon',ok:false},{em:'🎠',w:'A ride',ok:false}],say:"I want a snack please!"},
+      {q:"How does Bluey feel after eating?",choices:[{em:'😄',w:'Happy',ok:true},{em:'😢',w:'Sad',ok:false},{em:'😴',w:'Tired',ok:false}],say:"I am happy!"},
+    ]
+  },
+  {
+    title:"Splash Time!",em:'🛁',sub:'Bath time adventure',
+    frames:[
+      {sky:'🌳🌻',main:'🧒💦',ground:'🌿🪨',bg:'linear-gradient(180deg,#FFF9C4,#FFF3E0)',
+       caption:"Rishi has been playing outside. He is all muddy!",
+       narrate:"Oh wow! Rishi played outside all day! He is very muddy and dirty!",
+       say:"I am dirty!",sayLabel:"Say:"},
+      {sky:'🫧🌀',main:'🛁💦',ground:'🧴🪥',bg:'linear-gradient(180deg,#B3E5FC,#E1F5FE)',
+       caption:"Time for a bath! Splash splash splash!",
+       narrate:"Bath time! Splash splash splash! The water is warm and bubbly!",
+       say:"Splash splash!",sayLabel:"Say:"},
+      {sky:'🫧✨',main:'🧒🪸',ground:'🦆💦',bg:'linear-gradient(180deg,#E8F5E9,#DCEDC8)',
+       caption:"Rishi plays with the duck. Quack quack!",
+       narrate:"Look! A rubber duck! Quack quack! Rishi is squeaky clean!",
+       say:"Quack quack!",sayLabel:"Say:"},
+      {sky:'⭐🌙',main:'🧒🛀',ground:'🌿🌸',bg:'linear-gradient(180deg,#F3E5F5,#EDE7F6)',
+       caption:"All clean! Rishi feels so fresh!",
+       narrate:"Rishi is all clean! He smells so good! Good job Rishi!",
+       say:"I am clean!",sayLabel:"Say:"},
+    ],
+    questions:[
+      {q:"Why did Rishi need a bath?",choices:[{em:'💩',w:'He was dirty',ok:true},{em:'🥵',w:'He was hot',ok:false},{em:'😴',w:'He was tired',ok:false}],say:"I was dirty!"},
+      {q:"What did Rishi play with?",choices:[{em:'🦆',w:'A duck',ok:true},{em:'🚗',w:'A car',ok:false},{em:'⚽',w:'A ball',ok:false}],say:"A rubber duck!"},
+      {q:"How does Rishi feel after his bath?",choices:[{em:'✨',w:'Clean',ok:true},{em:'😢',w:'Sad',ok:false},{em:'😡',w:'Angry',ok:false}],say:"I am clean and happy!"},
+    ]
+  },
+  {
+    title:"Park Adventure!",em:'🌳',sub:'A day at the playground',
+    frames:[
+      {sky:'☀️🌈',main:'👨‍👩‍👦',ground:'🌺🌿🌻',bg:'linear-gradient(180deg,#FFF9C4,#FFF3E0)',
+       caption:"The family is getting ready! Let's go to the park!",
+       narrate:"Today is park day! Mummy, Daddy and Rishi are getting ready! So exciting!",
+       say:"Let's go to the park!",sayLabel:"Say:"},
+      {sky:'🚗💨',main:'🚙🛣️',ground:'🌿🌳',bg:'linear-gradient(180deg,#DCEDC8,#C8E6C9)',
+       caption:"Zoom! The car goes fast to the park!",
+       narrate:"Zoom zoom! In the car we go! Are we there yet? Almost!",
+       say:"Go go go!",sayLabel:"Say:"},
+      {sky:'☀️🌤️',main:'🧒🛝',ground:'🌳🌺🌿',bg:'linear-gradient(180deg,#B3E5FC,#E1F5FE)',
+       caption:"Wheee! Rishi goes down the slide!",
+       narrate:"Wheee! Rishi goes down the slide! Up the ladder, down the slide! So fast!",
+       say:"Wheee! I am sliding!",sayLabel:"Say:"},
+      {sky:'🌙⭐',main:'🧒😊',ground:'🌺🌿',bg:'linear-gradient(180deg,#F8BBD9,#FCE4EC)',
+       caption:"Time to go home. Rishi had so much fun!",
+       narrate:"Time to go home! Rishi had the best day! Bye bye park! See you soon!",
+       say:"Bye bye! I had fun!",sayLabel:"Say:"},
+    ],
+    questions:[
+      {q:"Where did the family go?",choices:[{em:'🌳',w:'The park',ok:true},{em:'🏊',w:'The pool',ok:false},{em:'🛒',w:'The shop',ok:false}],say:"We went to the park!"},
+      {q:"What did Rishi go on?",choices:[{em:'🛝',w:'The slide',ok:true},{em:'🎡',w:'The wheel',ok:false},{em:'🏠',w:'A house',ok:false}],say:"I went on the slide!"},
+      {q:"How does Rishi feel?",choices:[{em:'😊',w:'Happy',ok:true},{em:'😢',w:'Sad',ok:false},{em:'😡',w:'Angry',ok:false}],say:"I am happy! I had fun!"},
+    ]
+  },
+  {
+    title:"Goodnight, Rishi!",em:'🌙',sub:'Bedtime story',
+    frames:[
+      {sky:'🌅🌄',main:'🧒😴',ground:'🛋️🌿',bg:'linear-gradient(180deg,#F8BBD9,#FCE4EC)',
+       caption:"Rishi is tired after a big day of playing!",
+       narrate:"What a big day! Rishi played and played. Now he is so very tired!",
+       say:"I am tired!",sayLabel:"Say:"},
+      {sky:'🫧✨',main:'🦷🪥',ground:'🛁💙',bg:'linear-gradient(180deg,#BBDEFB,#E3F2FD)',
+       caption:"First, brush brush brush those teeth!",
+       narrate:"Brush your teeth first! Brush brush brush! Now they are sparkly clean!",
+       say:"Brush teeth!",sayLabel:"Say:"},
+      {sky:'⭐🌙',main:'📖🧒',ground:'🛏️🌙',bg:'linear-gradient(180deg,#EDE7F6,#F3E5F5)',
+       caption:"Mummy reads Rishi a bedtime story.",
+       narrate:"Snuggle up! Mummy reads a story. Once upon a time... Rishi listens quietly.",
+       say:"Read a story please!",sayLabel:"Say:"},
+      {sky:'💤💫',main:'😴⭐',ground:'🌙🛏️',bg:'linear-gradient(180deg,#1a1a3e,#2d2d5e)',
+       caption:"Goodnight, Rishi! Sweet dreams!",
+       narrate:"Rishi closes his eyes. Goodnight Rishi! Sweet sweet dreams. We love you!",
+       say:"Goodnight! I love you!",sayLabel:"Say:"},
+    ],
+    questions:[
+      {q:"Why is Rishi tired?",choices:[{em:'🎮',w:'He played',ok:true},{em:'🏫',w:'He studied',ok:false},{em:'🍔',w:'He ate too much',ok:false}],say:"I played all day!"},
+      {q:"Who reads the story?",choices:[{em:'👩',w:'Mummy',ok:true},{em:'👨',w:'Daddy',ok:false},{em:'🐶',w:'Doggy',ok:false}],say:"Mummy reads!"},
+      {q:"What does Rishi say at the end?",choices:[{em:'💤',w:'Goodnight',ok:true},{em:'👋',w:'Goodbye',ok:false},{em:'🎉',w:'Happy birthday',ok:false}],say:"Goodnight! I love you!"},
+    ]
+  },
+];
+
+const PARENT_TIPS={
+  color:"🎨 Rainbow Catch\n\nABA: Colour Tact training\n\nWhen Rishi taps the correct colour:\n• Name it together: 'Red! Yes, RED!'\n• Expand: 'I see a big RED circle!'\n\nIf he taps wrong:\n• Gently point to the right one\n• Say the colour as he taps\n\nEcholalia tip: After the game says the colour, wait 3 seconds before helping — he may echo it spontaneously!",
+  count:"🚂 Number Train\n\nABA: Number Tact + counting\n\nCount TOGETHER by tapping each animal.\nCount aloud as each one lights up.\n\nAfter: hold up your fingers matching the total.\n\nExpand: 'Four! FOUR animals! I count four!'\n\nEcholalia tip: Say the next number slowly — leave a gap: 'One... two... thr—' and wait for him to finish.",
+  letter:"🔤 Letter Safari\n\nABA: Letter-sound Tact\n\nBefore each round:\n• Trace the letter shape in the air together\n• Say: 'B makes the buh sound! Buh-buh-B!'\n\nWhen correct: 'Ball starts with B! B-B-BALL!'\n\nEcholalia tip: Say 'B is for...' and pause — he may echo 'Ball' from memory!",
+  action:"🦸 Action Hero\n\nABA: Action word Intraverbal\n\nDO the action WITH Rishi first — model it together.\n\nAfter confirming: point to him and ask 'What are you DOING?'\n\nWait 5 seconds before helping.\n\nEcholalia tip: Narrate what HE does: 'Rishi is jumping!' — this is a Tact, and hearing it helps him say it next time!",
+  echo:"🗣️ Echo & Grow\n\nABA: Script Fading + Echoic Transfer\n\nThis game builds functional phrases from echolalia.\n\nHow to use:\n1. Press 🔊 to play the phrase\n2. Wait — Rishi may echo it spontaneously\n3. If he echoes: tap ✅ Rishi said it!\n4. If he doesn't: model it once slowly, then tap confirm\n\nNEVER withhold the item to force speech.\nAlways confirm even partial attempts.\n\nThe goal: the phrase eventually comes WITHOUT hearing it — that is the Mand!",
+  story:"📖 Story World\n\nABA: Intraverbal + narrative language\n\nDuring each frame:\n• Read the caption together\n• Point to each emoji and name it\n• Press 🔊 to hear the narration\n\nFor the 'Say it' prompt:\n• Say it WITH Rishi first\n• Then wait and see if he says it alone\n\nFor questions:\n• Accept pointing as a valid answer\n• Expand whatever he says\n• 'Dog! Yes, it's a dog! Bluey is a dog!'\n\nEcholalia tip: The narration gives him scripts he can use later — this is purposeful delayed echolalia building!",
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function goHome(){speechSynthesis.cancel();updateHomeStars();showScreen('screen-home');document.getElementById('pp').classList.remove('open')}
+function togglePP(){document.getElementById('pp').classList.toggle('open')}
+function setPP(type){document.getElementById('pp-body').textContent=PARENT_TIPS[type]||'Select a game to see tips.'}
+function rnd(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function updateHomeStars(){
+  let total=0;
+  ['color','count','letter','action','echo','story'].forEach(g=>{
+    const n=S.gameStars[g];total+=n;
+    document.getElementById('gs-'+g).textContent='⭐'.repeat(n)+'☆'.repeat(5-n);
+  });
+  document.getElementById('total-stars').textContent=total;
+}
+function setDots(round,max){
+  document.getElementById('round-dots').innerHTML=Array.from({length:max},(_,i)=>`<div class="dot${i<round?' done':''}"></div>`).join('');
+}
+function addScore(n=1){S.score+=n;document.getElementById('sess-score').textContent=S.score}
+
+const GOOD=['Amazing! 🎉','YES! 🌟','Brilliant! ⭐','Wow! 🏆','Super! 🦸','You got it! 🎊','Fantastic! 💫'];
+const BAD=['Try again! 💪','Almost! 🌈','You can do it! ✨'];
+function showFeedback(ok,cb){
+  const o=document.getElementById('fb');
+  document.getElementById('fb-em').textContent=ok?'⭐':'💙';
+  document.getElementById('fb-tx').textContent=ok?rnd(GOOD):rnd(BAD);
+  o.classList.add('show');speak(ok?'Amazing! Great job!':'Try again! You can do it!');
+  setTimeout(()=>{o.classList.remove('show');cb&&cb()},1350);
+}
+function confetti(){
+  const c=document.getElementById('confetti');c.innerHTML='';
+  const cols=['#FFD700','#FF6B6B','#A29BFE','#74B9FF','#55EFC4','#FD79A8'];
+  for(let i=0;i<80;i++){const p=document.createElement('div');p.className='cp';const sz=8+Math.random()*10;p.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${rnd(cols)};border-radius:${Math.random()>.5?'50%':'3px'};--d:${2.5+Math.random()*2}s;--dl:${Math.random()*1.5}s`;c.appendChild(p)}
+  setTimeout(()=>c.innerHTML='',5000);
+}
+function celebrate(type){
+  const stars=S.score>=5?5:S.score>=3?4:S.score>=2?3:2;
+  S.gameStars[type]=Math.max(S.gameStars[type],stars);
+  document.getElementById('cel-title').textContent=stars===5?'PERFECT! 🏆':stars>=4?'Amazing! 🌟':'Great Job! ⭐';
+  document.getElementById('cel-sub').textContent=`You scored ${S.score} stars, Rishi! You're a superstar!`;
+  document.getElementById('cel-stars').textContent='⭐'.repeat(stars);
+  showScreen('screen-celebrate');confetti();
+  setTimeout(()=>speak(`Yay Rishi! You are amazing! You scored ${S.score} stars!`),300);
+}
+
+// ══ GAME LAUNCHER ════════════════════════════════════════════════════════════
+function startGame(type){
+  S.game=type;S.round=0;S.score=0;S.locked=false;
+  document.getElementById('sess-score').textContent='0';
+  document.getElementById('gname').textContent={color:'🎨 Rainbow Catch',count:'🚂 Number Train',letter:'🔤 Letter Safari',action:'🦸 Action Hero'}[type];
+  document.getElementById('ginstr').textContent={color:'Tap the right colour!',count:'Count all the animals!',letter:'Which word starts with this letter?',action:'Do the action and find it!'}[type];
+  setDots(0,S.maxRounds);setPP(type);showScreen('screen-game');
+  setTimeout(()=>{speak({color:"Let's play Rainbow Catch! Find the colour!",count:"Number Train! Count all the animals!",letter:"Letter Safari! Match the letter!",action:"Action Hero! Move and say it!"}[type]);setTimeout(()=>nextRound(type),1100)},400);
+}
+function nextRound(type){
+  if(S.round>=S.maxRounds){celebrate(type);return}
+  setDots(S.round,S.maxRounds);
+  ({color:colorRound,count:countRound,letter:letterRound,action:actionRound})[type]();
+}
+
+// ── Colour ────────────────────────────────────────────────────────────────────
+function colorRound(){
+  S.locked=false;
+  const pool=shuffle(COLORS).slice(0,6);
+  const tgt=rnd(pool);
+  curTgt=tgt.say;
+  document.getElementById('stgt').textContent=tgt.say;
+  document.getElementById('sparent').textContent=`Expand: "${tgt.expand}"`;
+  const area=document.getElementById('game-area');
+  area.innerHTML=`<div class="color-grid">${pool.map(c=>`<div class="color-btn" style="background:${c.hex}" onclick="colorPick('${c.n}','${tgt.n}',this)">${c.em}</div>`).join('')}</div>`;
+  setTimeout(()=>speak(`Find the colour ${tgt.n}! ${tgt.n}!`,.78),300);
+}
+function colorPick(picked,tgt,btn){
+  if(S.locked)return;S.locked=true;
+  const ok=picked===tgt;btn.classList.add(ok?'correct':'wrong');
+  if(ok)addScore(1);
+  showFeedback(ok,()=>{S.round++;nextRound('color')});
+}
+
+// ── Count ─────────────────────────────────────────────────────────────────────
+function countRound(){
+  S.locked=false;S.tapped=new Set();
+  const n=1+Math.floor(Math.random()*5);const em=rnd(ANIMALS);
+  curTgt=`${n}! I count ${n}!`;
+  document.getElementById('stgt').textContent=curTgt;
+  document.getElementById('sparent').textContent=`Count together: "One, two... ${n}!"`;
+  document.getElementById('game-area').innerHTML=`
+    <div style="text-align:center;width:100%">
+      <div class="animal-grid">${Array.from({length:n},(_,i)=>`<div class="animal-btn" id="ab${i}" onclick="tapAnimal(${i},${n})">${em}</div>`).join('')}</div>
+      <div class="count-num" id="cnt-num">?</div>
+      <div style="color:rgba(255,255,255,.65);font-size:.9rem;font-weight:700;margin:6px 0">Tap each one to count!</div>
+      <button class="btn-primary" id="btn-chk" style="display:none;margin-top:8px" onclick="checkCount(${n})">✅ I counted ${n}!</button>
+    </div>`;
+  setTimeout(()=>speak(`How many? Count them! Tap each one!`,.8),300);
+}
+function tapAnimal(i,total){
+  if(S.locked||S.tapped.has(i))return;
+  S.tapped.add(i);
+  document.getElementById('ab'+i).classList.add('tapped');
+  const c=S.tapped.size;
+  document.getElementById('cnt-num').textContent=c;
+  speak(`${c}`,.9);
+  if(c===total){document.getElementById('btn-chk').style.display='block';speak(`${total}! You counted ${total}!`,.8)}
+}
+function checkCount(total){
+  if(S.locked)return;S.locked=true;addScore(1);
+  showFeedback(true,()=>{S.round++;nextRound('count')});
+}
+
+// ── Letter ────────────────────────────────────────────────────────────────────
+function letterRound(){
+  S.locked=false;
+  const ld=rnd(LETTERS);
+  const choices=shuffle([ld.ok,...ld.no]);
+  curTgt=`${ld.l}! ${ld.l} is for ${ld.ok.w}!`;
+  document.getElementById('stgt').textContent=curTgt;
+  document.getElementById('sparent').textContent=`Say: "${ld.l} makes the ${ld.l.toLowerCase()} sound!"`;
+  document.getElementById('game-area').innerHTML=`
+    <div style="text-align:center;width:100%">
+      <div class="letter-big">${ld.l}</div>
+      <div style="color:rgba(255,255,255,.75);font-weight:700;font-size:.95rem;margin:8px 0 14px">Which word starts with <span style="color:#FFD700;font-weight:900">${ld.l}</span>?</div>
+      <div class="letter-choices">${choices.map(c=>`<div class="letter-btn" onclick="letterPick('${c.w}','${ld.ok.w}',this)"><div class="lc-em">${c.em}</div><div class="lc-wd">${c.w}</div></div>`).join('')}</div>
+    </div>`;
+  setTimeout(()=>speak(`The letter ${ld.l}! Which word starts with ${ld.l}?`,.78),300);
+}
+function letterPick(picked,correct,btn){
+  if(S.locked)return;S.locked=true;
+  const ok=picked===correct;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok)document.querySelectorAll('.letter-btn').forEach(b=>{if(b.querySelector('.lc-wd').textContent===correct)b.classList.add('correct')});
+  if(ok)addScore(1);
+  setTimeout(()=>speak(ok?`Yes! ${correct} starts with ${correct[0]}!`:`${correct} starts with ${correct[0]}!`,.82),100);
+  showFeedback(ok,()=>{S.round++;nextRound('letter')});
+}
+
+// ── Action ────────────────────────────────────────────────────────────────────
+function actionRound(){
+  S.locked=false;
+  const act=rnd(ACTIONS);
+  const others=shuffle(APOOL.filter(a=>a.w!==act.w)).slice(0,2);
+  const choices=shuffle([{w:act.w,em:act.em},...others]);
+  curTgt=`"I am ${act.w.toLowerCase()}ing!"`;
+  document.getElementById('stgt').textContent=curTgt;
+  document.getElementById('sparent').textContent=`Do it WITH Rishi first, then ask: "What are you doing?"`;
+  document.getElementById('game-area').innerHTML=`
+    <div style="text-align:center;width:100%;display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div class="action-big">${act.em}</div>
+      <div class="action-word">${act.w}!</div>
+      <div class="action-instr">${act.instr}</div>
+      <div style="color:rgba(255,255,255,.6);font-size:.9rem;font-weight:700">Now tap the matching picture:</div>
+      <div class="action-choices">${choices.map(c=>`<div class="action-btn" onclick="actionPick('${c.w}','${act.w}',this)"><div class="ac-em">${c.em}</div><div class="ac-wd">${c.w}</div></div>`).join('')}</div>
+    </div>`;
+  setTimeout(()=>speak(`${act.w}! ${act.instr.split('!')[0]}! Say: I am ${act.w.toLowerCase()}ing!`,.8),300);
+}
+function actionPick(picked,correct,btn){
+  if(S.locked)return;S.locked=true;
+  const ok=picked===correct;
+  btn.style.cssText+=ok?';border-color:#FFD700;background:rgba(255,215,0,.3)':';border-color:#E53935;background:rgba(229,57,53,.25)';
+  if(!ok)document.querySelectorAll('.action-btn').forEach(b=>{if(b.querySelector('.ac-wd').textContent===correct){b.style.borderColor='#FFD700';b.style.background='rgba(255,215,0,.3)'}});
+  if(ok)addScore(1);
+  setTimeout(()=>speak(ok?`Yes! You are ${correct.toLowerCase()}ing!`:`That is ${correct.toLowerCase()}ing!`,.82),100);
+  showFeedback(ok,()=>{S.round++;nextRound('action')});
+}
+
+// ══ ECHO & GROW ══════════════════════════════════════════════════════════════
+function startEcho(){
+  S.echoProgram=rnd(ECHO_PROGRAMS);S.echoStage=0;S.echoScore=0;
+  S.score=0;document.getElementById('echo-score').textContent='0';
+  setPP('echo');showScreen('screen-echo');
+  renderEchoStage();
+  setTimeout(()=>speak("Echo and Grow! Listen to the phrase. Then say it! Ready?",.8),400);
+}
+function renderEchoStage(){
+  const prog=S.echoProgram;const stage=prog.stages[S.echoStage];
+  document.getElementById('echo-scene').textContent=prog.scene;
+  document.getElementById('echo-scene-label').textContent=prog.label;
+  const wordColors=['w0','w1','w2','w3','w4'];
+  document.getElementById('phrase-words').innerHTML=stage.words.map((w,i)=>`<div class="phrase-word ${wordColors[i]}" style="--delay:${i*.15}s">${w}</div>`).join('');
+  document.getElementById('echo-tip-text').textContent=stage.tip;
+  document.getElementById('echo-tip-parent').textContent='👨‍👩‍👦 Parent: '+stage.parent;
+  const pct=Math.round((S.echoStage/prog.stages.length)*100);
+  document.getElementById('echo-fill').style.width=pct+'%';
+  document.getElementById('echo-stage-label').textContent=`Stage ${S.echoStage+1} of ${prog.stages.length}`;
+  document.getElementById('echo-score').textContent=S.score;
+  setTimeout(()=>speakEchoPhrase(),500);
+}
+function speakEchoPhrase(){
+  const stage=S.echoProgram.stages[S.echoStage];
+  speak(stage.words.join(' '),.68);
+}
+function confirmEcho(){
+  // Flash words to celebrate
+  document.querySelectorAll('.phrase-word').forEach((w,i)=>{
+    setTimeout(()=>{w.style.transform='scale(1.2)';setTimeout(()=>w.style.transform='scale(1)',200)},i*80);
+  });
+  S.score++;S.echoScore++;
+  document.getElementById('echo-score').textContent=S.score;
+  speak(S.echoProgram.stages[S.echoStage].words.join(' ')+'. Amazing!',.8);
+  S.echoStage++;
+  if(S.echoStage>=S.echoProgram.stages.length){
+    setTimeout(()=>{
+      const stars=Math.min(5,S.score);
+      S.gameStars.echo=Math.max(S.gameStars.echo,stars);
+      document.getElementById('cel-title').textContent='INCREDIBLE! 🏆';
+      document.getElementById('cel-sub').textContent=`Rishi grew his phrases from 1 word to ${S.echoProgram.stages[S.echoProgram.stages.length-1].words.length} words!`;
+      document.getElementById('cel-stars').textContent='⭐'.repeat(stars);
+      showScreen('screen-celebrate');confetti();
+      speak(`Incredible! Rishi can say ${S.echoProgram.stages[S.echoProgram.stages.length-1].words.join(' ')}! Amazing job!`,.8);
+    },600);
+  } else {
+    setTimeout(()=>{
+      // Feedback then show next stage
+      const fb=document.getElementById('fb');
+      document.getElementById('fb-em').textContent='🌱';
+      document.getElementById('fb-tx').textContent='Your phrase is GROWING!';
+      fb.classList.add('show');
+      setTimeout(()=>{fb.classList.remove('show');renderEchoStage()},1200);
+    },400);
+  }
+}
+
+// ══ STORY WORLD ══════════════════════════════════════════════════════════════
+function startStorySelect(){
+  setPP('story');
+  const grid=document.getElementById('story-grid');
+  grid.innerHTML=STORIES.map((s,i)=>`
+    <div class="story-card" onclick="startStory(${i})">
+      <div class="story-card-emoji">${s.em}</div>
+      <div class="story-card-title">${s.title}</div>
+      <div class="story-card-sub">${s.sub}</div>
+    </div>`).join('');
+  showScreen('screen-story-select');
+}
+function startStory(idx){
+  S.story=STORIES[idx];S.frameIdx=0;S.qIdx=0;S.qScore=0;S.score=0;
+  document.getElementById('story-title-badge').textContent=S.story.em+' '+S.story.title;
+  buildStoryProgress();renderFrame();showScreen('screen-story-read');
+}
+function buildStoryProgress(){
+  document.getElementById('story-prog').innerHTML=
+    S.story.frames.map((_,i)=>`<div class="story-dot${i<S.frameIdx?' done':i===S.frameIdx?' active':''}"></div>`).join('');
+}
+function renderFrame(){
+  buildStoryProgress();
+  const f=S.story.frames[S.frameIdx];
+  const isLast=S.frameIdx===S.story.frames.length-1;
+  document.getElementById('btn-next-frame').textContent=isLast?'Questions! ▶':'Next ▶';
+  document.getElementById('story-frame').innerHTML=`
+    <div class="scene-box" style="background:${f.bg}">
+      <div class="scene-sky">${f.sky}</div>
+      <div class="scene-main">${f.main}</div>
+      <div class="scene-ground">${f.ground}</div>
+    </div>
+    <div class="scene-caption">${f.caption}</div>
+    <div class="scene-speech">
+      <div style="font-size:1.5rem">💬</div>
+      <div class="speech-content">
+        <div class="scene-say">${f.sayLabel}</div>
+        <div class="speech-bubble-text">${f.say}</div>
+      </div>
+      <button class="btn-speak" onclick="speakSay()">🔊</button>
+    </div>`;
+  setTimeout(()=>speak(f.narrate,.78),400);
+}
+function speakSay(){speak(S.story.frames[S.frameIdx].say,.68)}
+function replayFrame(){speak(S.story.frames[S.frameIdx].narrate,.78)}
+function nextFrame(){
+  if(S.frameIdx<S.story.frames.length-1){S.frameIdx++;renderFrame()}
+  else{startQuestions()}
+}
+function startQuestions(){
+  S.qIdx=0;S.qScore=0;
+  document.getElementById('sq-score').textContent='0';
+  showScreen('screen-story-q');renderQuestion();
+}
+function renderQuestion(){
+  if(S.qIdx>=S.story.questions.length){
+    const stars=S.qScore>=3?5:S.qScore===2?4:3;
+    S.gameStars.story=Math.max(S.gameStars.story,stars);
+    S.score=S.qScore;
+    document.getElementById('cel-title').textContent='Story Complete! 📖';
+    document.getElementById('cel-sub').textContent=`Rishi read the whole story and answered ${S.qScore} questions!`;
+    document.getElementById('cel-stars').textContent='⭐'.repeat(stars);
+    showScreen('screen-celebrate');confetti();
+    speak(`Story complete! Rishi is an amazing reader! ${S.qScore} correct answers!`,.8);
+    return;
+  }
+  const q=S.story.questions[S.qIdx];
+  const choices=shuffle(q.choices);
+  document.getElementById('sq-header').textContent=`Question ${S.qIdx+1} of ${S.story.questions.length}`;
+  document.getElementById('sq-q').textContent=q.q;
+  document.getElementById('sq-choices').innerHTML=choices.map((c,i)=>`<div class="sq-btn" onclick="storyPick(${c.ok},this)"><div class="sq-em">${c.em}</div><div class="sq-wd">${c.w}</div></div>`).join('');
+  document.getElementById('sq-say').textContent=`💬 Say: "${q.say}"`;
+  speak(q.q,.8);
+  setTimeout(()=>speak(q.say,.72),2000);
+}
+function storyPick(ok,btn){
+  if(S.locked)return;S.locked=true;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok)document.querySelectorAll('.sq-btn').forEach(b=>{
+    // mark correct — check by looking at data
+    const chosen=S.story.questions[S.qIdx].choices.find(c=>c.ok);
+    if(b.querySelector('.sq-wd').textContent===chosen.w)b.classList.add('correct');
+  });
+  if(ok){S.qScore++;document.getElementById('sq-score').textContent=S.qScore}
+  speak(ok?'Correct! Amazing!':'Good try! Let\'s keep going!',.85);
+  setTimeout(()=>{
+    S.locked=false;S.qIdx++;renderQuestion();
+  },1300);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+updateHomeStars();
+setTimeout(()=>speak('Hello Rishi! Welcome to your Magic World! Let us play!',.82),900);
+
+// ══ PWA INIT ═════════════════════════════════════════════════════════════════
+(function pwaInit() {
+
+  // ── Build app icon via canvas ─────────────────────────────────────────────
+  function makeIcon(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    // rounded background
+    const r = size * 0.18;
+    ctx.beginPath();
+    ctx.moveTo(r, 0); ctx.lineTo(size - r, 0);
+    ctx.quadraticCurveTo(size, 0, size, r);
+    ctx.lineTo(size, size - r);
+    ctx.quadraticCurveTo(size, size, size - r, size);
+    ctx.lineTo(r, size); ctx.quadraticCurveTo(0, size, 0, size - r);
+    ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0, '#0D7377'); grad.addColorStop(1, '#5B4FCF');
+    ctx.fillStyle = grad; ctx.fill();
+    // star emoji
+    ctx.font = `${Math.round(size * 0.58)}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('🌟', size / 2, size / 2 + size * 0.03);
+    return c.toDataURL('image/png');
+  }
+
+  const icon192 = makeIcon(192);
+  const icon512 = makeIcon(512);
+
+  // ── Set apple-touch-icon ──────────────────────────────────────────────────
+  document.getElementById('pwa-apple-icon').href = icon192;
+
+  // ── Inject Web App Manifest via Blob URL ──────────────────────────────────
+  const manifest = {
+    name: "Rishi's Magic World",
+    short_name: "Rishi's World",
+    description: "A fun ABA-aligned learning game for Rishi!",
+    start_url: "./",
+    scope: "./",
+    display: "fullscreen",
+    orientation: "portrait-primary",
+    theme_color: "#0D7377",
+    background_color: "#1a1a2e",
+    lang: "en",
+    categories: ["education", "games"],
+    icons: [
+      { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+      { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+    ]
+  };
+  const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  document.getElementById('pwa-manifest').href = URL.createObjectURL(mBlob);
+
+  // ── Register Service Worker ───────────────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js', { scope: './' })
+      .then(reg => {
+        console.log('[PWA] Service worker registered. Scope:', reg.scope);
+        // Show "install" prompt when browser fires it
+        window.addEventListener('beforeinstallprompt', e => {
+          e.preventDefault();
+          window._installPrompt = e;
+          document.getElementById('pwa-install-btn').style.display = 'flex';
+        });
+        window.addEventListener('appinstalled', () => {
+          document.getElementById('pwa-install-btn').style.display = 'none';
+        });
+      })
+      .catch(err => console.warn('[PWA] SW registration failed:', err));
+  }
+
+})();
+// ═════════════════════════════════════════════════════════════════════════════
+</script>
+
+<!-- PWA install button (shown only when browser supports it) -->
+<div id="pwa-install-btn" style="
+  display:none; position:fixed; bottom:64px; left:12px; z-index:500;
+  background:linear-gradient(135deg,#0D7377,#5B4FCF);
+  color:#fff; border-radius:50px; padding:10px 18px; gap:8px;
+  font-family:'Nunito',sans-serif; font-size:.9rem; font-weight:800;
+  box-shadow:0 6px 24px rgba(0,0,0,.3); cursor:pointer; align-items:center;
+" onclick="(async()=>{if(window._installPrompt){await window._installPrompt.prompt();window._installPrompt=null;this.style.display='none'}})()">
+  📲 Install App
+</div>
+
+</body>
+</html>
