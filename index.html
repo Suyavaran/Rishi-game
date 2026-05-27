@@ -475,9 +475,59 @@ html,body{width:100%;height:100%;overflow:hidden;
 
 // ── Speech ────────────────────────────────────────────────────────────────────
 let curTgt='';
-function speak(text,rate=.8){if(!text)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=rate;u.pitch=1.12;u.volume=1;const vs=speechSynthesis.getVoices();const v=vs.find(v=>v.name.includes('Samantha')||v.name.includes('Karen')||v.name.includes('Google UK English Female'));if(v)u.voice=v;speechSynthesis.speak(u);return u}
-function speakTgt(){speak(curTgt,.72)}
-window.addEventListener('load',()=>speechSynthesis.getVoices());
+let _bestVoice=null;
+
+// Voice priority list — most natural first across all platforms
+const VOICE_PRIORITY=[
+  // Apple neural (iOS/macOS) — very human
+  'Samantha (Enhanced)','Moira (Enhanced)','Karen (Enhanced)',
+  // Google neural (Android/Chrome desktop) — very human
+  'Google US English','Google UK English Female',
+  // Microsoft neural (Windows/Edge) — very human
+  'Microsoft Aria Online (Natural) - English (United States)',
+  'Microsoft Jenny Online (Natural) - English (United States)',
+  'Microsoft Zira - English (United States)',
+  // Apple standard (still decent)
+  'Samantha','Karen','Moira',
+  // Generic fallbacks — any English female preferred
+];
+
+function _pickVoice(){
+  const all=speechSynthesis.getVoices();
+  if(!all.length)return null;
+  // Try priority list first
+  for(const name of VOICE_PRIORITY){
+    const v=all.find(v=>v.name===name);
+    if(v)return v;
+  }
+  // Fallback: any en-US female-sounding or en voice
+  return all.find(v=>/en[-_]US/i.test(v.lang) && /female|woman|girl/i.test(v.name))
+      || all.find(v=>/en[-_]US/i.test(v.lang))
+      || all.find(v=>/^en/i.test(v.lang))
+      || null;
+}
+
+function _initVoice(){
+  _bestVoice=_pickVoice();
+}
+// Voices may not be ready immediately — wait for the event
+speechSynthesis.addEventListener('voiceschanged',_initVoice);
+window.addEventListener('load',()=>{ speechSynthesis.getVoices(); setTimeout(_initVoice,300); });
+
+function speak(text,rate=0.82){
+  if(!text)return;
+  speechSynthesis.cancel();
+  // Re-try voice pick if not yet resolved
+  if(!_bestVoice) _bestVoice=_pickVoice();
+  const u=new SpeechSynthesisUtterance(text);
+  if(_bestVoice) u.voice=_bestVoice;
+  u.rate  = rate;     // slightly slower = warmer, more natural
+  u.pitch = 1.05;     // just above neutral — not robotic, not squeaky
+  u.volume= 1;
+  speechSynthesis.speak(u);
+  return u;
+}
+function speakTgt(){speak(curTgt,0.75)}
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const S={
